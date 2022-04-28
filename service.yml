@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: express-eks
+  labels:
+    app: express-eks
+spec:
+  type: LoadBalancer
+  selector:
+    app: express-eks
+  ports:
+    - port: 8000
+      targetPort: 3333
+      protocol: TCP
