@@ -2,21 +2,21 @@
   "kind":"Service",
   "apiVersion":"v1",
   "metadata":{
-     "name":"bluegreenlb",
-     "labels":{
-        "app":"bluegreenlb"
-     }
+    "name":"bluegreenlb",
+    "labels":{
+      "app":"bluegreenlb"
+    }
   },
   "spec":{
-     "ports": [
-        {
-          "port":80,
-          "targetPort":3333
-        }
-     ],
-     "selector":{
-        "app":"blue"
-     },
-     "type": "LoadBalancer"
+    "ports": [
+      {
+        "port":80,
+        "targetPort":3333
+      }
+    ],
+    "selector":{
+      "app":"blue"
+    },
+    "type": "LoadBalancer"
   }
 }
