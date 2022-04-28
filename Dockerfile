@@ -14,7 +14,7 @@ RUN npm install
 RUN npm ci --only=production
 
 # Copy source files
-COPY /api/ . .
+COPY /api/ . ./
 
 # Expose ports
 EXPOSE 3333
