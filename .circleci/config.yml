@@ -1,5 +1,6 @@
 version: '2.1'
 orbs:
+  docker: circleci/docker@2.0.3
   aws-eks: circleci/aws-eks@2.1.2
   kubernetes: circleci/kubernetes@1.3
 
@@ -36,34 +37,37 @@ jobs:
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
-          resource-file-path: tests/nginx-deployment/deployment.yaml
-          resource-name: deployment/nginx-deployment
+          resource-file-path: deployment.json
+          resource-name: deployment/blue
 
 workflows:
-  deployment:
+  default:
     jobs:
-      - aws-eks/create-cluster:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-      - test-cluster:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-          requires:
-            - aws-eks/create-cluster
-      - create-deployment:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-          requires:
-            - test-cluster
-      - aws-eks/update-container-image:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-          container-image-updates: 'nginx=nginx:1.9.1'
-          post-steps:
-            - kubernetes/delete-resource:
-                resource-names: nginx-deployment
-                resource-types: deployment
-                wait: true
-          requires:
-            - create-deployment
-          resource-name: deployment/nginx-deployment
-      - aws-eks/delete-cluster:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-          requires:
-            - aws-eks/update-container-image
+      - docker/publish:
+          image: gytisl/express-eks
+          update-description: true
+      # - aws-eks/create-cluster:
+      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+      # - test-cluster:
+      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+      #     requires:
+      #       - aws-eks/create-cluster
+      # - create-deployment:
+      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+      #     requires:
+      #       - test-cluster
+      # - aws-eks/update-container-image:
+      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+      #     container-image-updates: 'nginx=nginx:1.9.1'
+      #     post-steps:
+      #       - kubernetes/delete-resource:
+      #           resource-names: nginx-deployment
+      #           resource-types: deployment
+      #           wait: true
+      #     requires:
+      #       - create-deployment
+      #     resource-name: deployment/nginx-deployment
+      # - aws-eks/delete-cluster:
+      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+      #     requires:
+      #       - aws-eks/update-container-image
