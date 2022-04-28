@@ -40,22 +40,57 @@ jobs:
           resource-file-path: deployment.json
           resource-name: deployment/blue
 
+  create-service:
+    executor: aws-eks/python3
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+          install-kubectl: true
+      - kubernetes/create-or-update-resource:
+          resource-file-path: service.json
+          resource-name: service/bluegreenlb
+
 workflows:
   default:
     jobs:
+      # STEP 1: Install hadolint? and lint Dockerfile
+      # also lint express api?
+
+      # STEP 2: build docker container from Dockerfile and pish to docker hub
       - docker/publish:
           image: gytisl/express-eks
           # update-description: true
-      # - aws-eks/create-cluster:
-      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-      # - test-cluster:
-      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-      #     requires:
-      #       - aws-eks/create-cluster
-      # - create-deployment:
-      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-      #     requires:
-      #       - test-cluster
+
+      # STEP 3: Create Kubernetes cluster
+      - aws-eks/create-cluster:
+          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          requires:
+            - docker/publish
+
+      # STEP 4: Test Kubernetes cluster
+      - test-cluster:
+          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          requires:
+            - aws-eks/create-cluster
+
+      - create-lb:
+          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          requires:
+            - test-cluster
+
+      # STEP 5: Create Kubernetes deployment
+      - create-deployment:
+          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          requires:
+            - create-lb
+
+      # STEP 6: Update container image
       # - aws-eks/update-container-image:
       #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
       #     container-image-updates: 'nginx=nginx:1.9.1'
@@ -67,6 +102,8 @@ workflows:
       #     requires:
       #       - create-deployment
       #     resource-name: deployment/nginx-deployment
+
+      # ADDITIONAL: Delete cluster, run on_fail later
       # - aws-eks/delete-cluster:
       #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
       #     requires:
