@@ -66,4 +66,4 @@ workflows:
       - aws-eks/delete-cluster:
           cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
           requires:
-            - test-cluster
+            - aws-eks/update-container-image
