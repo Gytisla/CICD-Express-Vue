@@ -10,8 +10,8 @@
   "spec":{
      "ports": [
         {
-          "port":3333,
-          "targetPort":80
+          "port":80,
+          "targetPort":3333
         }
      ],
      "selector":{
