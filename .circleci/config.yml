@@ -36,7 +36,7 @@ jobs:
           cluster-name: << parameters.cluster-name >>
           install-kubectl: true
       - kubernetes/create-or-update-resource:
-          resource-file-path: service.json
+          resource-file-path: service.yml
           resource-name: service/bluegreenlb
 
   create-deployment:
@@ -53,7 +53,7 @@ jobs:
           cluster-name: << parameters.cluster-name >>
           install-kubectl: true
       - kubernetes/create-or-update-resource:
-          resource-file-path: deployment.json
+          resource-file-path: deployment.yml
           resource-name: deployment/blue
 
 workflows:
@@ -104,7 +104,7 @@ workflows:
       #     resource-name: deployment/nginx-deployment
 
       # ADDITIONAL: Delete cluster, run on_fail later
-      # - aws-eks/delete-cluster:
-      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-      #     requires:
-      #       - aws-eks/update-container-image
+      - aws-eks/delete-cluster:
+          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          requires:
+            - create-deployment
