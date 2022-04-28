@@ -40,7 +40,7 @@ jobs:
           resource-file-path: deployment.json
           resource-name: deployment/blue
 
-  create-service:
+  create-lb:
     executor: aws-eks/python3
     parameters:
       cluster-name:
