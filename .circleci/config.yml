@@ -45,7 +45,7 @@ workflows:
     jobs:
       - docker/publish:
           image: gytisl/express-eks
-          # update-description: true
+          update-description: true
       # - aws-eks/create-cluster:
       #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
       # - test-cluster:
