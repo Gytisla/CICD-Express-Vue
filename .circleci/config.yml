@@ -104,7 +104,7 @@ workflows:
       #     resource-name: deployment/nginx-deployment
 
       # ADDITIONAL: Delete cluster, run on_fail later
-      - aws-eks/delete-cluster:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-          requires:
-            - create-deployment
+      # - aws-eks/delete-cluster:
+      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+      #     requires:
+      #       - create-deployment
