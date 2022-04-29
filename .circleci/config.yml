@@ -118,7 +118,6 @@ workflows:
       - aws-eks/update-container-image:
           cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
           container-image-updates: 'blue=gytisl/express-eks:latest'
-          record: true
           requires:
             - create-deployment
           resource-name: deployment/blue
