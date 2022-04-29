@@ -1,29 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: express-eks
+  name: express-eks-cluster
   labels:
     app: express-eks
-  namespace: default
 spec:
   replicas: 2
-  progressDeadlineSeconds: 3600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: express-eks
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
   template:
     metadata:
       labels:
         app: express-eks
     spec:
       containers:
-        - image: gytisl/express-eks
+        - name: express-eks
+          image: gytisl/express-eks:latest
           imagePullPolicy: Always
-          name: express-eks
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
           ports:
             - containerPort: 3333

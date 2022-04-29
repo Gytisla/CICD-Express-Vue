@@ -75,7 +75,7 @@ jobs:
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           resource-file-path: deployment.yml
-          resource-name: deployment/express-eks
+          resource-name: deployment/express-eks-cluster
 
 workflows:
   default:
@@ -90,7 +90,7 @@ workflows:
 
       # STEP 3: Create Kubernetes cluster
       - create-small-cluster:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          cluster-name: express-eks-cluster
       # - aws-eks/create-cluster:
       #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
       #     requires:
@@ -98,25 +98,25 @@ workflows:
 
       # STEP 4: Test Kubernetes cluster
       - test-cluster:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          cluster-name: express-eks-cluster
           requires:
             - create-small-cluster
             # - aws-eks/create-cluster
 
       - create-lb:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          cluster-name: express-eks-cluster
           requires:
             - test-cluster
 
       # STEP 5: Create Kubernetes deployment
       - create-deployment:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          cluster-name: express-eks-cluster
           requires:
             - create-lb
 
       # STEP 6: Update container image
       - aws-eks/update-container-image:
-          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          cluster-name: express-eks-cluster
           container-image-updates: 'express-eks=gytisl/express-eks:latest'
           requires:
             - create-deployment
