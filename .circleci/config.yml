@@ -75,7 +75,7 @@ jobs:
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           resource-file-path: deployment.yml
-          resource-name: deployment/blue
+          resource-name: deployment/express-eks
 
 workflows:
   default:
@@ -120,7 +120,7 @@ workflows:
           container-image-updates: 'express-eks=gytisl/express-eks:latest'
           requires:
             - create-deployment
-          resource-name: deployment/blue
+          resource-name: deployment/express-eks
       # - aws-eks/update-container-image:
       #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
       #     container-image-updates: 'nginx=nginx:1.9.1'
