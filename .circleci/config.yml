@@ -115,6 +115,13 @@ workflows:
             - create-lb
 
       # STEP 6: Update container image
+      - aws-eks/update-container-image:
+          cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+          container-image-updates: 'blue=gytisl/express-eks:latest'
+          record: true
+          requires:
+            - create-deployment
+          resource-name: deployment/blue
       # - aws-eks/update-container-image:
       #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
       #     container-image-updates: 'nginx=nginx:1.9.1'
