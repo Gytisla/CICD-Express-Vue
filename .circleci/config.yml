@@ -100,7 +100,8 @@ workflows:
       - test-cluster:
           cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
           requires:
-            - aws-eks/create-cluster
+            - create-small-cluster
+            # - aws-eks/create-cluster
 
       - create-lb:
           cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
