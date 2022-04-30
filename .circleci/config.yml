@@ -88,21 +88,6 @@ jobs:
           resource-file-path: deployment.yml
           resource-name: deployment/express-eks-cluster
 
-  update-container-image:
-    docker:
-      - image: 'cimg/python:3.10'
-    parameters:
-      cluster-name:
-        description: |
-          Name of the EKS cluster
-        type: string
-    steps:
-      - checkout
-      - aws-eks/update-container-image:
-          cluster-name: << parameters.cluster-name >>
-          container-image-updates: 'express-eks=gytisl/express-eks:latest'
-          resource-name: deployment/express-eks
-
   get-pods:
     docker:
       - image: 'cimg/python:3.10'
@@ -154,8 +139,13 @@ workflows:
             - docker/publish
 
       # STEP 6: Update container image
-      - update-container-image:
+      - aws-eks/update-container-image:
           cluster-name: express-eks-cluster
+          container-image-updates: 'express-eks=gytisl/express-eks:latest'
+          resource-name: deployment/express-eks
+          show-kubectl-command: true
+          get-rollout-status: true
+          watch-timeout: 5m
           requires:
             - create-deployment
 
