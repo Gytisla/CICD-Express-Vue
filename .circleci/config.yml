@@ -101,7 +101,7 @@ workflows:
       - test-cluster:
           cluster-name: express-eks-cluster
           requires:
-            - create-small-cluster
+            # - create-small-cluster
             # - aws-eks/create-cluster
 
       - create-lb:
