@@ -9,6 +9,6 @@ spec:
   selector:
     app: express-eks
   ports:
-    - port: 80
+    - port: 8000
       targetPort: 3333
       protocol: TCP
