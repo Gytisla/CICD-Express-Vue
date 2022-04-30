@@ -121,6 +121,7 @@ workflows:
           cluster-name: express-eks-cluster
 
       - test-cluster:
+          cluster-name: express-eks-cluster
           requires:
             - create-small-cluster
 
