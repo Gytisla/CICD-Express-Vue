@@ -42,6 +42,7 @@ jobs:
       - run:
           command: |
             kubectl get services
+            kubectl get pods
           name: Test cluster
 
   create-lb:
