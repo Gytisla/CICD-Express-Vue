@@ -26,8 +26,12 @@ jobs:
           ssh-access: false
           ssh-public-key: ''
           zones: 'us-east-1a,us-east-1b,us-east-1d'
+      - run:
+          command: |
+            kubectl get services
+          name: Test cluster
 
-  test-cluster:
+  get-pods:
     docker:
       - image: 'cimg/python:3.10'
     parameters:
@@ -41,7 +45,6 @@ jobs:
           cluster-name: << parameters.cluster-name >>
       - run:
           command: |
-            kubectl get services
             kubectl get pods
           name: Test cluster
 
@@ -86,30 +89,19 @@ workflows:
       # also lint express api?
 
       # STEP 2: build docker container from Dockerfile and pish to docker hub
-      # - docker/publish:
-      #     image: gytisl/express-eks
-      #     # update-description: true
-      #     tag: latest
+      - docker/publish:
+          image: gytisl/express-eks
+          tag: latest
 
       # STEP 3: Create Kubernetes cluster
-      # - create-small-cluster:
-      #     cluster-name: express-eks-cluster
-      # - aws-eks/create-cluster:
-      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-      #     requires:
-      #       - docker/publish
+      - create-small-cluster:
+          cluster-name: express-eks-cluster
 
-      # STEP 4: Test Kubernetes cluster
-      # - test-cluster:
-      #     cluster-name: express-eks-cluster
-          # requires:
-            # - create-small-cluster
-            # - aws-eks/create-cluster
-
+      # STEP 4: Create LB Service
       - create-lb:
           cluster-name: express-eks-cluster
-          # requires:
-          #   - test-cluster
+          requires:
+            - create-small-cluster
 
       # STEP 5: Create Kubernetes deployment
       - create-deployment:
@@ -125,24 +117,14 @@ workflows:
             - create-deployment
           resource-name: deployment/express-eks
 
-      - test-cluster:
+      # Get Kubernetes pods
+      - get-pods:
           cluster-name: express-eks-cluster
           requires:
             - aws-eks/update-container-image
-      # - aws-eks/update-container-image:
-      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
-      #     container-image-updates: 'nginx=nginx:1.9.1'
-      #     post-steps:
-      #       - kubernetes/delete-resource:
-      #           resource-names: nginx-deployment
-      #           resource-types: deployment
-      #           wait: true
-      #     requires:
-      #       - create-deployment
-      #     resource-name: deployment/nginx-deployment
 
-      # ADDITIONAL: Delete cluster, run on_fail later
+      # ADDITIONAL: Delete cluster
       # - aws-eks/delete-cluster:
-      #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
+      #     cluster-name: api-eks-cluster
       #     requires:
       #       - create-deployment
