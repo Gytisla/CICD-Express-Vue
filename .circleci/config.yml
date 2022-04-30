@@ -90,8 +90,8 @@ workflows:
           # update-description: true
 
       # STEP 3: Create Kubernetes cluster
-      - create-small-cluster:
-          cluster-name: express-eks-cluster
+      # - create-small-cluster:
+      #     cluster-name: express-eks-cluster
       # - aws-eks/create-cluster:
       #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
       #     requires:
