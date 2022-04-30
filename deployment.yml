@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: express-eks
-          image: gytisl/express-eks:latest
+          image: gytisl/express-eks
           imagePullPolicy: Always
           resources:
             requests:
