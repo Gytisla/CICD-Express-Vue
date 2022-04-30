@@ -21,12 +21,12 @@ jobs:
         type: string
     steps:
       - checkout
+      - aws-eks/install-aws-iam-authenticator:
+          release-tag: ''
       - when:
           condition:
             equal: [ true, << pipeline.parameters.run_create_cluster >> ]
           steps:
-            - aws-eks/install-aws-iam-authenticator:
-                release-tag: ''
             - aws-eks/create-cluster:
                 cluster-name: << parameters.cluster-name >>
                 skip-kubectl-install: false
