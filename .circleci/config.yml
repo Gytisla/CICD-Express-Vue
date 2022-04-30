@@ -86,10 +86,10 @@ workflows:
       # also lint express api?
 
       # STEP 2: build docker container from Dockerfile and pish to docker hub
-      - docker/publish:
-          image: gytisl/express-eks
-          update-description: true
-          tag: latest
+      # - docker/publish:
+      #     image: gytisl/express-eks
+      #     # update-description: true
+      #     tag: latest
 
       # STEP 3: Create Kubernetes cluster
       # - create-small-cluster:
