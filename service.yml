@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: express-lb
   labels:
-    app: express-eks
+    app: express-lb
 spec:
   type: LoadBalancer
   selector:
