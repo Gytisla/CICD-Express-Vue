@@ -54,23 +54,6 @@ jobs:
             kubectl get services
           name: Test cluster
 
-  get-pods:
-    docker:
-      - image: 'cimg/python:3.10'
-    parameters:
-      cluster-name:
-        description: |
-          Name of the EKS cluster
-        type: string
-    steps:
-      - kubernetes/install
-      - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: << parameters.cluster-name >>
-      - run:
-          command: |
-            kubectl get pods
-          name: Test cluster
-
   create-lb:
     docker:
       - image: 'cimg/python:3.10'
@@ -104,6 +87,38 @@ jobs:
       - kubernetes/create-or-update-resource:
           resource-file-path: deployment.yml
           resource-name: deployment/express-eks-cluster
+
+  update-container-image:
+    docker:
+      - image: 'cimg/python:3.10'
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
+      - aws-eks/update-container-image:
+          cluster-name: << parameters.cluster-name >>
+          container-image-updates: 'express-eks=gytisl/express-eks:latest'
+          resource-name: deployment/express-eks
+
+  get-pods:
+    docker:
+      - image: 'cimg/python:3.10'
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - kubernetes/install
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+      - run:
+          command: |
+            kubectl get pods
+          name: Get pods
 
 workflows:
   default:
@@ -139,12 +154,10 @@ workflows:
             - docker/publish
 
       # STEP 6: Update container image
-      - aws-eks/update-container-image:
+      - update-container-image:
           cluster-name: express-eks-cluster
-          container-image-updates: 'express-eks=gytisl/express-eks:latest'
           requires:
             - create-deployment
-          resource-name: deployment/express-eks
 
       # Get Kubernetes pods
       - get-pods:
