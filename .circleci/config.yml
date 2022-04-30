@@ -98,16 +98,16 @@ workflows:
       #       - docker/publish
 
       # STEP 4: Test Kubernetes cluster
-      - test-cluster:
-          cluster-name: express-eks-cluster
+      # - test-cluster:
+      #     cluster-name: express-eks-cluster
           # requires:
             # - create-small-cluster
             # - aws-eks/create-cluster
 
       - create-lb:
           cluster-name: express-eks-cluster
-          requires:
-            - test-cluster
+          # requires:
+          #   - test-cluster
 
       # STEP 5: Create Kubernetes deployment
       - create-deployment:
@@ -122,7 +122,11 @@ workflows:
           requires:
             - create-deployment
           resource-name: deployment/express-eks
-      
+
+      - test-cluster:
+          cluster-name: express-eks-cluster
+          requires:
+            - aws-eks/update-container-image
       # - aws-eks/update-container-image:
       #     cluster-name: api-eks-${CIRCLE_WORKFLOW_ID:0:5}
       #     container-image-updates: 'nginx=nginx:1.9.1'
