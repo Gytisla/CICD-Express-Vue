@@ -7,11 +7,9 @@ WORKDIR /app
 # Copy package json files for services
 COPY /api/package*.json /app/
 
-# Install packages
-RUN npm install
-
-# Build code for production
-RUN npm ci --only=production
+# Install packages and build application
+RUN npm install \
+  && ci --only=production
 
 # Copy source files
 COPY /api/ . ./
