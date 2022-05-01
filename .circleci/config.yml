@@ -8,7 +8,7 @@ orbs:
 parameters:
   run_create_cluster:
     type: boolean
-    default: false
+    default: true
 
 jobs:
   lint-expressjs:
@@ -66,7 +66,7 @@ jobs:
             kubectl get services
           name: Test cluster
 
-  create-lb:
+  create-lb-service:
     docker:
       - image: 'cimg/python:3.10'
     parameters:
@@ -120,54 +120,60 @@ jobs:
 workflows:
   default:
     jobs:
-      # STEP 1: Lint expressjs app
+      # Lint expressjs app
       - lint-expressjs
 
-      # STEP 1: Lint Dockerfile
+      # Lint Dockerfile
       - docker/hadolint:
           dockerfiles: Dockerfile
           executor-class: medium
-      # STEP 2: build docker container from Dockerfile and pish to docker hub
-      # - docker/publish:
-      #     image: gytisl/express-eks
-      #     tag: latest
 
-      # # STEP 3: Create Kubernetes cluster if run_create_cluster parameter is true
-      # - create-small-cluster:
-      #     cluster-name: express-eks-cluster
+      # Build docker container from Dockerfile and pish to docker hub
+      - docker/publish:
+          image: gytisl/express-eks
+          tag: latest
+          requires:
+            - lint-expressjs
+            - docker/publish
 
-      # # STEP : Test Kubernetes cluster
-      # - test-cluster:
-      #     cluster-name: express-eks-cluster
-      #     requires:
-      #       - create-small-cluster
+      # Create Kubernetes cluster if run_create_cluster parameter is true
+      - create-small-cluster:
+          cluster-name: express-eks-cluster
+          requires:
+            - docker/publish
 
-      # # STEP 4: Create LB Service
-      # - create-lb:
-      #     cluster-name: express-eks-cluster
-      #     requires:
-      #       - test-cluster
+      # Test Kubernetes cluster
+      - test-cluster:
+          cluster-name: express-eks-cluster
+          requires:
+            - create-small-cluster
 
-      # # STEP 5: Create Kubernetes deployment
-      # - create-deployment:
-      #     cluster-name: express-eks-cluster
-      #     requires:
-      #       - test-cluster
-      #       - docker/publish
+      # Create LB Service
+      - create-lb-service:
+          cluster-name: express-eks-cluster
+          requires:
+            - test-cluster
 
-      # # STEP 6: Update container image
-      # - aws-eks/update-container-image:
-      #     cluster-name: express-eks-cluster
-      #     container-image-updates: 'express-eks=gytisl/express-eks:latest'
-      #     resource-name: deployment/express-eks
-      #     show-kubectl-command: true
-      #     get-rollout-status: true
-      #     watch-timeout: 5m
-      #     requires:
-      #       - create-deployment
+      # Create Kubernetes deployment
+      - create-deployment:
+          cluster-name: express-eks-cluster
+          requires:
+            - test-cluster
+            - docker/publish
 
-      # # Get Kubernetes pods
-      # - get-pods:
-      #     cluster-name: express-eks-cluster
-      #     requires:
-      #       - aws-eks/update-container-image
+      # Update container image - rolling update
+      - aws-eks/update-container-image:
+          cluster-name: express-eks-cluster
+          container-image-updates: 'express-eks=gytisl/express-eks:latest'
+          resource-name: deployment/express-eks
+          show-kubectl-command: true
+          get-rollout-status: true
+          watch-timeout: 5m
+          requires:
+            - create-deployment
+
+      # Get Kubernetes pods
+      - get-pods:
+          cluster-name: express-eks-cluster
+          requires:
+            - aws-eks/update-container-image

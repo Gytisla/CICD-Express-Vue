@@ -4,6 +4,8 @@ FROM node:16
 # Set up working dir
 WORKDIR /app
 
+asd 
+
 # Copy package json files for services
 COPY /api/package*.json /app/
 
