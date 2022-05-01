@@ -11,6 +11,18 @@ parameters:
     default: false
 
 jobs:
+  lint-expressjs:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Lint expressjs
+          command: |
+            cd api/
+            npm install
+            npm run lint
+  
   create-small-cluster:
     docker:
       - image: 'cimg/python:3.10'
@@ -108,8 +120,10 @@ jobs:
 workflows:
   default:
     jobs:
-      # STEP 1: Install hadolint? and lint Dockerfile
-      # also lint express api?
+      # STEP 1: Lint expressjs app
+      - lint-expressjs
+
+      # STEP 1: Lint Dockerfile
       - docker/hadolint:
           dockerfiles: Dockerfile
           executor-class: medium
