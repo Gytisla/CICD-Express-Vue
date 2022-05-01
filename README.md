@@ -1,3 +1,5 @@
+[![Gytisla](https://circleci.com/gh/Gytisla/CICD-Express-Vue.svg?style=svg)](https://app.circleci.com/pipelines/github/Gytisla)
+
 # CICD-Express
 
 ### Deploy Docker container with ExpressJS application to EKS Cluster on AWS using CircleCI pipeline
