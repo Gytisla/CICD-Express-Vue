@@ -134,7 +134,7 @@ workflows:
           tag: latest
           requires:
             - lint-expressjs
-            - docker/publish
+            - docker/hadolint
 
       # Create Kubernetes cluster if run_create_cluster parameter is true
       - create-small-cluster:
